@@ -1,16 +1,38 @@
 {
   "name": "@otp.com/sdk-node",
   "version": "1.0.0",
-  "description": "OpenAPI client for @otp.com/sdk-node",
-  "author": "OpenAPI-Generator",
+  "description": "TypeScript client for the otp.com OTP API: send, verify, and resend one-time passwords.",
+  "author": "otp.com",
+  "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/GIT_USER_ID/GIT_REPO_ID.git"
+    "url": "git+https://github.com/otp-com/sdk-node.git"
   },
+  "bugs": {
+    "url": "https://github.com/otp-com/sdk-node/issues"
+  },
+  "homepage": "https://github.com/otp-com/sdk-node#readme",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "module": "./dist/esm/index.js",
   "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "otp",
+    "2fa",
+    "one-time-password",
+    "verification",
+    "sdk",
+    "typescript"
+  ],
   "scripts": {
     "build": "tsc && tsc -p tsconfig.esm.json",
     "prepare": "npm run build"
