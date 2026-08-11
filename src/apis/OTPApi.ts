@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * otp OTP API
- * Public API for sending and verifying one-time passwords. Authenticate every request with your API key as a Bearer token. The delivery channel is chosen by your account routing; you only pass the recipient. The code itself is never returned by the API. 
+ * Public API for sending and verifying one-time passwords. Authenticate every request with your API key as a Bearer token. The delivery channel is chosen by your account routing; you only pass the recipient. The code itself is never returned by the API.  Errors are always `{\"error\": {\"type\", \"message\", \"details\"?}}`.  When routing picks WhatsApp the code is not sent yet: the send response carries an `action_url` (a wa.me link) the user opens to receive the code over WhatsApp, and the OTP stays pending until they enter it. Verification is identical on every channel.
  *
  * The version of the OpenAPI document: 1.0.0
  * 
@@ -13,6 +13,11 @@
  */
 
 import * as runtime from '../runtime';
+import {
+    type ErrorResponse,
+    ErrorResponseFromJSON,
+    ErrorResponseToJSON,
+} from '../models/ErrorResponse';
 import {
     type OtpResponse,
     OtpResponseFromJSON,
@@ -64,7 +69,7 @@ export interface SendOtpRequest {
      */
     sendRequest: SendRequest;
     /**
-     * Replays the prior response for the same key; a reused key with a different body is a 409.
+     * Replay the prior response for a repeated request; a reused key with a different body is a 409.
      */
     idempotencyKey?: string;
 }
@@ -79,7 +84,7 @@ export interface VerifyOtpRequest {
 /**
  * 
  */
-export class OTPApi extends runtime.BaseAPI {
+export class OtpApi extends runtime.BaseAPI {
 
     /**
      * Creates request options for getOtpStatus without sending the request
@@ -105,7 +110,7 @@ export class OTPApi extends runtime.BaseAPI {
             }
         }
 
-        let urlPath = `/otp/{otp_id}`;
+        let urlPath = `/api/v1/otp/{otp_id}`;
         urlPath = urlPath.replace('{otp_id}', encodeURIComponent(String(requestParameters['otpId'])));
 
         return {
@@ -117,7 +122,7 @@ export class OTPApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get OTP status
+     * Fetch the current status of an OTP.
      */
     async getOtpStatusRaw(requestParameters: GetOtpStatusRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OtpStatusResponse>> {
         const requestOptions = await this.getOtpStatusRequestOpts(requestParameters);
@@ -127,7 +132,7 @@ export class OTPApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get OTP status
+     * Fetch the current status of an OTP.
      */
     async getOtpStatus(requestParameters: GetOtpStatusRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OtpStatusResponse> {
         const response = await this.getOtpStatusRaw(requestParameters, initOverrides);
@@ -160,7 +165,7 @@ export class OTPApi extends runtime.BaseAPI {
             }
         }
 
-        let urlPath = `/otp/resend`;
+        let urlPath = `/api/v1/otp/resend`;
 
         return {
             path: urlPath,
@@ -172,8 +177,7 @@ export class OTPApi extends runtime.BaseAPI {
     }
 
     /**
-     * Resend a pending OTP, advancing to the next configured channel (e.g. SMS to WhatsApp).
-     * Resend an OTP
+     * Resend a pending OTP, escalating the channel if configured.
      */
     async resendOtpRaw(requestParameters: ResendOtpRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OtpResponse>> {
         const requestOptions = await this.resendOtpRequestOpts(requestParameters);
@@ -183,8 +187,7 @@ export class OTPApi extends runtime.BaseAPI {
     }
 
     /**
-     * Resend a pending OTP, advancing to the next configured channel (e.g. SMS to WhatsApp).
-     * Resend an OTP
+     * Resend a pending OTP, escalating the channel if configured.
      */
     async resendOtp(requestParameters: ResendOtpRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OtpResponse> {
         const response = await this.resendOtpRaw(requestParameters, initOverrides);
@@ -209,7 +212,7 @@ export class OTPApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         if (requestParameters['idempotencyKey'] != null) {
-            headerParameters['Idempotency-Key'] = String(requestParameters['idempotencyKey']);
+            headerParameters['idempotency-key'] = String(requestParameters['idempotencyKey']);
         }
 
         if (this.configuration && this.configuration.accessToken) {
@@ -221,7 +224,7 @@ export class OTPApi extends runtime.BaseAPI {
             }
         }
 
-        let urlPath = `/otp/send`;
+        let urlPath = `/api/v1/otp/send`;
 
         return {
             path: urlPath,
@@ -233,8 +236,8 @@ export class OTPApi extends runtime.BaseAPI {
     }
 
     /**
-     * Generate a one-time password and deliver it to the recipient. The channel is chosen by your app\'s routing (default order + per-country overrides). Returns an `otp_id` to verify against. When routing picks WhatsApp the code is not sent yet: the response carries an `action_url` (a wa.me link) the user opens to receive the code over WhatsApp, and the OTP stays pending until they enter it. On every channel the user enters the code and you call `/otp/verify`. 
-     * Send an OTP
+     * Routing picks the channel from the app config. When it selects WhatsApp the code is not sent yet: the response returns action_url (a wa.me link) the user opens to receive the code over WhatsApp, and the OTP stays pending until they enter it. On all other channels the code is delivered directly and action_url is null. Either way the user enters the code and you call POST /otp/verify.
+     * Start an OTP: routes a channel and dispatches the code.
      */
     async sendOtpRaw(requestParameters: SendOtpRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OtpResponse>> {
         const requestOptions = await this.sendOtpRequestOpts(requestParameters);
@@ -244,8 +247,8 @@ export class OTPApi extends runtime.BaseAPI {
     }
 
     /**
-     * Generate a one-time password and deliver it to the recipient. The channel is chosen by your app\'s routing (default order + per-country overrides). Returns an `otp_id` to verify against. When routing picks WhatsApp the code is not sent yet: the response carries an `action_url` (a wa.me link) the user opens to receive the code over WhatsApp, and the OTP stays pending until they enter it. On every channel the user enters the code and you call `/otp/verify`. 
-     * Send an OTP
+     * Routing picks the channel from the app config. When it selects WhatsApp the code is not sent yet: the response returns action_url (a wa.me link) the user opens to receive the code over WhatsApp, and the OTP stays pending until they enter it. On all other channels the code is delivered directly and action_url is null. Either way the user enters the code and you call POST /otp/verify.
+     * Start an OTP: routes a channel and dispatches the code.
      */
     async sendOtp(requestParameters: SendOtpRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OtpResponse> {
         const response = await this.sendOtpRaw(requestParameters, initOverrides);
@@ -278,7 +281,7 @@ export class OTPApi extends runtime.BaseAPI {
             }
         }
 
-        let urlPath = `/otp/verify`;
+        let urlPath = `/api/v1/otp/verify`;
 
         return {
             path: urlPath,
@@ -290,8 +293,7 @@ export class OTPApi extends runtime.BaseAPI {
     }
 
     /**
-     * Verify the code the user entered. `matched: true` means the code was correct.
-     * Verify an OTP
+     * Verify a code against a pending OTP.
      */
     async verifyOtpRaw(requestParameters: VerifyOtpRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<VerifyResponse>> {
         const requestOptions = await this.verifyOtpRequestOpts(requestParameters);
@@ -301,8 +303,7 @@ export class OTPApi extends runtime.BaseAPI {
     }
 
     /**
-     * Verify the code the user entered. `matched: true` means the code was correct.
-     * Verify an OTP
+     * Verify a code against a pending OTP.
      */
     async verifyOtp(requestParameters: VerifyOtpRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<VerifyResponse> {
         const response = await this.verifyOtpRaw(requestParameters, initOverrides);

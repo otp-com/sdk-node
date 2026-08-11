@@ -1,21 +1,22 @@
 
-# Channel
+# ErrorResponse
 
-Channel the OTP was dispatched on; null until routed.
 
 ## Properties
 
 Name | Type
 ------------ | -------------
+`error` | [ErrorBody](ErrorBody.md)
 
 ## Example
 
 ```typescript
-import type { Channel } from '@otp.com/sdk-node'
+import type { ErrorResponse } from '@otp.com/sdk-node'
 
 // TODO: Update the object below with actual values
 const example = {
-} satisfies Channel
+  "error": null,
+} satisfies ErrorResponse
 
 console.log(example)
 
@@ -24,7 +25,7 @@ const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as Channel
+const exampleParsed = JSON.parse(exampleJSON) as ErrorResponse
 console.log(exampleParsed)
 ```
 

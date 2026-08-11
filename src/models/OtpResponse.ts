@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * otp OTP API
- * Public API for sending and verifying one-time passwords. Authenticate every request with your API key as a Bearer token. The delivery channel is chosen by your account routing; you only pass the recipient. The code itself is never returned by the API. 
+ * Public API for sending and verifying one-time passwords. Authenticate every request with your API key as a Bearer token. The delivery channel is chosen by your account routing; you only pass the recipient. The code itself is never returned by the API.  Errors are always `{\"error\": {\"type\", \"message\", \"details\"?}}`.  When routing picks WhatsApp the code is not sent yet: the send response carries an `action_url` (a wa.me link) the user opens to receive the code over WhatsApp, and the OTP stays pending until they enter it. Verification is identical on every channel.
  *
  * The version of the OpenAPI document: 1.0.0
  * 
@@ -43,16 +43,15 @@ export interface OtpResponse {
      */
     status: Status;
     /**
-     * 
+     * Channel the OTP was dispatched on; null until routed.
      */
     channel: Channel | null;
     /**
-     * Recipient with the middle masked, e.g. +14****71.
+     * Recipient with the middle digits masked.
      */
     maskedRecipient: string;
     /**
-     * WhatsApp link the user opens to receive the code: they send us the prefilled message and we reply with the code over WhatsApp. Present only when the OTP was dispatched on the whatsapp channel; null otherwise. Verification is the same on every channel: the user enters the code and you call `/otp/verify`.
-     * 
+     * WhatsApp link the user opens to receive the code: they send us the prefilled message and we reply with the code over WhatsApp, then they enter it and you call POST /otp/verify. Present only when dispatched on the whatsapp channel; null otherwise.
      */
     actionUrl?: string | null;
 }

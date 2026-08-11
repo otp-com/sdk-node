@@ -17,7 +17,7 @@ import type { VerifyRequest } from '@otp.com/sdk-node'
 // TODO: Update the object below with actual values
 const example = {
   "otpId": null,
-  "code": null,
+  "code": 123456,
 } satisfies VerifyRequest
 
 console.log(example)

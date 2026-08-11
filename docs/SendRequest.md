@@ -16,8 +16,8 @@ import type { SendRequest } from '@otp.com/sdk-node'
 
 // TODO: Update the object below with actual values
 const example = {
-  "recipient": null,
-  "locale": null,
+  "recipient": +14155552671,
+  "locale": en,
 } satisfies SendRequest
 
 console.log(example)

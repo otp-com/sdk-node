@@ -19,7 +19,7 @@ import type { OtpStatusResponse } from '@otp.com/sdk-node'
 const example = {
   "otpId": null,
   "status": null,
-  "maskedRecipient": null,
+  "maskedRecipient": +14****71,
 } satisfies OtpStatusResponse
 
 console.log(example)

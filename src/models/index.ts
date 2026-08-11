@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './Channel';
-export * from './ErrorError';
-export * from './ModelError';
+export * from './ErrorBody';
+export * from './ErrorResponse';
 export * from './OtpResponse';
 export * from './OtpStatusResponse';
 export * from './ResendRequest';

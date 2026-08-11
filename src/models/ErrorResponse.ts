@@ -13,58 +13,60 @@
  */
 
 import { mapValues } from '../runtime';
+import type { ErrorBody } from './ErrorBody';
+import {
+    ErrorBodyFromJSON,
+    ErrorBodyFromJSONTyped,
+    ErrorBodyToJSON,
+    ErrorBodyToJSONTyped,
+} from './ErrorBody';
+
 /**
  * 
  * @export
- * @interface SendRequest
+ * @interface ErrorResponse
  */
-export interface SendRequest {
+export interface ErrorResponse {
     /**
-     * Phone number (E.164) or email address to deliver the OTP to.
+     * 
      */
-    recipient: string;
-    /**
-     * BCP-47 locale for the message template; falls back to the app default.
-     */
-    locale?: string | null;
+    error: ErrorBody;
 }
 
 /**
- * Check if a given object implements the SendRequest interface.
+ * Check if a given object implements the ErrorResponse interface.
  */
-export function instanceOfSendRequest(value: object): value is SendRequest {
-    if (!('recipient' in value) || value['recipient'] === undefined) return false;
+export function instanceOfErrorResponse(value: object): value is ErrorResponse {
+    if (!('error' in value) || value['error'] === undefined) return false;
     return true;
 }
 
-export function SendRequestFromJSON(json: any): SendRequest {
-    return SendRequestFromJSONTyped(json, false);
+export function ErrorResponseFromJSON(json: any): ErrorResponse {
+    return ErrorResponseFromJSONTyped(json, false);
 }
 
-export function SendRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): SendRequest {
+export function ErrorResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): ErrorResponse {
     if (json == null) {
         return json;
     }
     return {
         
-        'recipient': json['recipient'],
-        'locale': json['locale'] === undefined ? undefined : json['locale'] === null ? null : json['locale'],
+        'error': ErrorBodyFromJSON(json['error']),
     };
 }
 
-export function SendRequestToJSON(json: any): SendRequest {
-    return SendRequestToJSONTyped(json, false);
+export function ErrorResponseToJSON(json: any): ErrorResponse {
+    return ErrorResponseToJSONTyped(json, false);
 }
 
-export function SendRequestToJSONTyped(value?: SendRequest | null, ignoreDiscriminator: boolean = false): any {
+export function ErrorResponseToJSONTyped(value?: ErrorResponse | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
-        'recipient': value['recipient'],
-        'locale': value['locale'],
+        'error': ErrorBodyToJSON(value['error']),
     };
 }
 

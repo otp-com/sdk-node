@@ -22,7 +22,7 @@ const example = {
   "otpId": null,
   "status": null,
   "channel": null,
-  "maskedRecipient": null,
+  "maskedRecipient": +14****71,
   "actionUrl": https://wa.me/13845555555?text=Verify%20me%3A%20aB3xZ-9kQ2m-7pLw4-2mN8k,
 } satisfies OtpResponse
 

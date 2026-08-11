@@ -1,13 +1,13 @@
-# OTPApi
+# OtpApi
 
-All URIs are relative to *https://api.otp.com/api/v1*
+All URIs are relative to *https://api.otp.com*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**getOtpStatus**](OTPApi.md#getotpstatus) | **GET** /otp/{otp_id} | Get OTP status |
-| [**resendOtp**](OTPApi.md#resendotp) | **POST** /otp/resend | Resend an OTP |
-| [**sendOtp**](OTPApi.md#sendotp) | **POST** /otp/send | Send an OTP |
-| [**verifyOtp**](OTPApi.md#verifyotp) | **POST** /otp/verify | Verify an OTP |
+| [**getOtpStatus**](OtpApi.md#getotpstatus) | **GET** /api/v1/otp/{otp_id} | Fetch the current status of an OTP. |
+| [**resendOtp**](OtpApi.md#resendotp) | **POST** /api/v1/otp/resend | Resend a pending OTP, escalating the channel if configured. |
+| [**sendOtp**](OtpApi.md#sendotp) | **POST** /api/v1/otp/send | Start an OTP: routes a channel and dispatches the code. |
+| [**verifyOtp**](OtpApi.md#verifyotp) | **POST** /api/v1/otp/verify | Verify a code against a pending OTP. |
 
 
 
@@ -15,14 +15,14 @@ All URIs are relative to *https://api.otp.com/api/v1*
 
 > OtpStatusResponse getOtpStatus(otpId)
 
-Get OTP status
+Fetch the current status of an OTP.
 
 ### Example
 
 ```ts
 import {
   Configuration,
-  OTPApi,
+  OtpApi,
 } from '@otp.com/sdk-node';
 import type { GetOtpStatusRequest } from '@otp.com/sdk-node';
 
@@ -32,7 +32,7 @@ async function example() {
     // Configure HTTP bearer authorization: bearerAuth
     accessToken: "YOUR BEARER TOKEN",
   });
-  const api = new OTPApi(config);
+  const api = new OtpApi(config);
 
   const body = {
     // string
@@ -75,9 +75,10 @@ example().catch(console.error);
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-| **200** | Current status. |  -  |
-| **401** | Missing or invalid API key (also returned for a disabled app or suspended company). |  -  |
-| **404** | OTP not found (also returned for another company\&#39;s OTP, to avoid probing). |  -  |
+| **200** | Current status of the OTP. |  -  |
+| **400** | otp_id is not a valid UUID. |  -  |
+| **401** | Missing or invalid API key (also returned for a disabled app or a suspended company). |  -  |
+| **404** | OTP not found (the same 404 is returned for an OTP belonging to another company). |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
@@ -86,16 +87,14 @@ example().catch(console.error);
 
 > OtpResponse resendOtp(resendRequest)
 
-Resend an OTP
-
-Resend a pending OTP, advancing to the next configured channel (e.g. SMS to WhatsApp).
+Resend a pending OTP, escalating the channel if configured.
 
 ### Example
 
 ```ts
 import {
   Configuration,
-  OTPApi,
+  OtpApi,
 } from '@otp.com/sdk-node';
 import type { ResendOtpRequest } from '@otp.com/sdk-node';
 
@@ -105,7 +104,7 @@ async function example() {
     // Configure HTTP bearer authorization: bearerAuth
     accessToken: "YOUR BEARER TOKEN",
   });
-  const api = new OTPApi(config);
+  const api = new OtpApi(config);
 
   const body = {
     // ResendRequest
@@ -148,11 +147,13 @@ example().catch(console.error);
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-| **200** | Resend accepted. |  -  |
-| **401** | Missing or invalid API key (also returned for a disabled app or suspended company). |  -  |
-| **404** | OTP not found (also returned for another company\&#39;s OTP, to avoid probing). |  -  |
-| **409** | No enabled channel, channel not enabled, resend not allowed, or an idempotency-key conflict. |  -  |
-| **429** | Resend cooldown not elapsed. |  -  |
+| **200** | Resend accepted; the OTP may now be on a different channel. |  -  |
+| **401** | Missing or invalid API key (also returned for a disabled app or a suspended company). |  -  |
+| **404** | OTP not found (the same 404 is returned for an OTP belonging to another company). |  -  |
+| **409** | The OTP cannot be resent (resolved, expired, or out of attempts), or the requested channel is not enabled. |  -  |
+| **422** | Request body failed validation. |  -  |
+| **429** | Resend cooldown has not elapsed; see the Retry-After header. |  -  |
+| **503** | Routing picked WhatsApp but our inbound number is not configured. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
@@ -161,16 +162,16 @@ example().catch(console.error);
 
 > OtpResponse sendOtp(sendRequest, idempotencyKey)
 
-Send an OTP
+Start an OTP: routes a channel and dispatches the code.
 
-Generate a one-time password and deliver it to the recipient. The channel is chosen by your app\&#39;s routing (default order + per-country overrides). Returns an &#x60;otp_id&#x60; to verify against. When routing picks WhatsApp the code is not sent yet: the response carries an &#x60;action_url&#x60; (a wa.me link) the user opens to receive the code over WhatsApp, and the OTP stays pending until they enter it. On every channel the user enters the code and you call &#x60;/otp/verify&#x60;. 
+Routing picks the channel from the app config. When it selects WhatsApp the code is not sent yet: the response returns action_url (a wa.me link) the user opens to receive the code over WhatsApp, and the OTP stays pending until they enter it. On all other channels the code is delivered directly and action_url is null. Either way the user enters the code and you call POST /otp/verify.
 
 ### Example
 
 ```ts
 import {
   Configuration,
-  OTPApi,
+  OtpApi,
 } from '@otp.com/sdk-node';
 import type { SendOtpRequest } from '@otp.com/sdk-node';
 
@@ -180,12 +181,12 @@ async function example() {
     // Configure HTTP bearer authorization: bearerAuth
     accessToken: "YOUR BEARER TOKEN",
   });
-  const api = new OTPApi(config);
+  const api = new OtpApi(config);
 
   const body = {
     // SendRequest
     sendRequest: ...,
-    // string | Replays the prior response for the same key; a reused key with a different body is a 409. (optional)
+    // string | Replay the prior response for a repeated request; a reused key with a different body is a 409. (optional)
     idempotencyKey: idempotencyKey_example,
   } satisfies SendOtpRequest;
 
@@ -207,7 +208,7 @@ example().catch(console.error);
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
 | **sendRequest** | [SendRequest](SendRequest.md) |  | |
-| **idempotencyKey** | `string` | Replays the prior response for the same key; a reused key with a different body is a 409. | [Optional] [Defaults to `undefined`] |
+| **idempotencyKey** | `string` | Replay the prior response for a repeated request; a reused key with a different body is a 409. | [Optional] [Defaults to `undefined`] |
 
 ### Return type
 
@@ -227,9 +228,10 @@ example().catch(console.error);
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 | **201** | OTP created and delivery started. |  -  |
-| **401** | Missing or invalid API key (also returned for a disabled app or suspended company). |  -  |
-| **409** | No enabled channel, channel not enabled, resend not allowed, or an idempotency-key conflict. |  -  |
+| **401** | Missing or invalid API key (also returned for a disabled app or a suspended company). |  -  |
+| **409** | No channel can reach this recipient, or the idempotency key was reused with a different body. |  -  |
 | **422** | Request body failed validation. |  -  |
+| **503** | Routing picked WhatsApp but our inbound number is not configured. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
@@ -238,16 +240,14 @@ example().catch(console.error);
 
 > VerifyResponse verifyOtp(verifyRequest)
 
-Verify an OTP
-
-Verify the code the user entered. &#x60;matched: true&#x60; means the code was correct.
+Verify a code against a pending OTP.
 
 ### Example
 
 ```ts
 import {
   Configuration,
-  OTPApi,
+  OtpApi,
 } from '@otp.com/sdk-node';
 import type { VerifyOtpRequest } from '@otp.com/sdk-node';
 
@@ -257,7 +257,7 @@ async function example() {
     // Configure HTTP bearer authorization: bearerAuth
     accessToken: "YOUR BEARER TOKEN",
   });
-  const api = new OTPApi(config);
+  const api = new OtpApi(config);
 
   const body = {
     // VerifyRequest
@@ -301,8 +301,8 @@ example().catch(console.error);
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 | **200** | Verification result. |  -  |
-| **401** | Missing or invalid API key (also returned for a disabled app or suspended company). |  -  |
-| **404** | OTP not found (also returned for another company\&#39;s OTP, to avoid probing). |  -  |
+| **401** | Missing or invalid API key (also returned for a disabled app or a suspended company). |  -  |
+| **404** | OTP not found (the same 404 is returned for an OTP belonging to another company). |  -  |
 | **422** | Request body failed validation. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)

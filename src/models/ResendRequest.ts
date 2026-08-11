@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * otp OTP API
- * Public API for sending and verifying one-time passwords. Authenticate every request with your API key as a Bearer token. The delivery channel is chosen by your account routing; you only pass the recipient. The code itself is never returned by the API. 
+ * Public API for sending and verifying one-time passwords. Authenticate every request with your API key as a Bearer token. The delivery channel is chosen by your account routing; you only pass the recipient. The code itself is never returned by the API.  Errors are always `{\"error\": {\"type\", \"message\", \"details\"?}}`.  When routing picks WhatsApp the code is not sent yet: the send response carries an `action_url` (a wa.me link) the user opens to receive the code over WhatsApp, and the OTP stays pending until they enter it. Verification is identical on every channel.
  *
  * The version of the OpenAPI document: 1.0.0
  * 
@@ -13,6 +13,14 @@
  */
 
 import { mapValues } from '../runtime';
+import type { Channel } from './Channel';
+import {
+    ChannelFromJSON,
+    ChannelFromJSONTyped,
+    ChannelToJSON,
+    ChannelToJSONTyped,
+} from './Channel';
+
 /**
  * 
  * @export
@@ -20,27 +28,15 @@ import { mapValues } from '../runtime';
  */
 export interface ResendRequest {
     /**
-     * 
+     * The OTP id to resend.
      */
     otpId: string;
     /**
      * Move this OTP onto a specific channel, e.g. "sms" when the recipient has no WhatsApp. The channel must be enabled for your app and the recipient. Omit to advance to the next channel in your routing order.
-     * 
      */
-    channel?: ResendRequestChannelEnum | null;
+    channel?: Channel | null;
 }
 
-
-/**
- * @export
- */
-export const ResendRequestChannelEnum = {
-    Sms: 'sms',
-    Whatsapp: 'whatsapp',
-    Email: 'email',
-    Telegram: 'telegram'
-} as const;
-export type ResendRequestChannelEnum = typeof ResendRequestChannelEnum[keyof typeof ResendRequestChannelEnum];
 
 
 /**
@@ -62,7 +58,7 @@ export function ResendRequestFromJSONTyped(json: any, ignoreDiscriminator: boole
     return {
         
         'otpId': json['otp_id'],
-        'channel': json['channel'] === undefined ? undefined : json['channel'] === null ? null : json['channel'],
+        'channel': json['channel'] === undefined ? undefined : json['channel'] === null ? null : ChannelFromJSON(json['channel']),
     };
 }
 
@@ -78,7 +74,7 @@ export function ResendRequestToJSONTyped(value?: ResendRequest | null, ignoreDis
     return {
         
         'otp_id': value['otpId'],
-        'channel': value['channel'],
+        'channel': ChannelToJSON(value['channel']),
     };
 }
 

@@ -7,7 +7,7 @@
 Name | Type
 ------------ | -------------
 `otpId` | string
-`channel` | string
+`channel` | [Channel](Channel.md)
 
 ## Example
 

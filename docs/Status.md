@@ -1,7 +1,6 @@
 
 # Status
 
-OTP lifecycle status.
 
 ## Properties
 
