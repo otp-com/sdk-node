@@ -8,6 +8,7 @@ Name | Type
 ------------ | -------------
 `recipient` | string
 `locale` | string
+`clientIp` | string
 
 ## Example
 
@@ -18,6 +19,7 @@ import type { SendRequest } from '@otp.com/sdk-node'
 const example = {
   "recipient": +14155552671,
   "locale": en,
+  "clientIp": 81.2.69.142,
 } satisfies SendRequest
 
 console.log(example)
