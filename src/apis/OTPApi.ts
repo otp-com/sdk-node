@@ -84,7 +84,7 @@ export interface VerifyOtpRequest {
 /**
  * 
  */
-export class OtpApi extends runtime.BaseAPI {
+export class OTPApi extends runtime.BaseAPI {
 
     /**
      * Creates request options for getOtpStatus without sending the request

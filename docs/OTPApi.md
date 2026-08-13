@@ -1,13 +1,13 @@
-# OtpApi
+# OTPApi
 
 All URIs are relative to *https://api.otp.com*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**getOtpStatus**](OtpApi.md#getotpstatus) | **GET** /api/v1/otp/{otp_id} | Fetch the current status of an OTP. |
-| [**resendOtp**](OtpApi.md#resendotp) | **POST** /api/v1/otp/resend | Resend a pending OTP, escalating the channel if configured. |
-| [**sendOtp**](OtpApi.md#sendotp) | **POST** /api/v1/otp/send | Start an OTP: routes a channel and dispatches the code. |
-| [**verifyOtp**](OtpApi.md#verifyotp) | **POST** /api/v1/otp/verify | Verify a code against a pending OTP. |
+| [**getOtpStatus**](OTPApi.md#getotpstatus) | **GET** /api/v1/otp/{otp_id} | Fetch the current status of an OTP. |
+| [**resendOtp**](OTPApi.md#resendotp) | **POST** /api/v1/otp/resend | Resend a pending OTP, escalating the channel if configured. |
+| [**sendOtp**](OTPApi.md#sendotp) | **POST** /api/v1/otp/send | Start an OTP: routes a channel and dispatches the code. |
+| [**verifyOtp**](OTPApi.md#verifyotp) | **POST** /api/v1/otp/verify | Verify a code against a pending OTP. |
 
 
 
@@ -22,7 +22,7 @@ Fetch the current status of an OTP.
 ```ts
 import {
   Configuration,
-  OtpApi,
+  OTPApi,
 } from '@otp.com/sdk-node';
 import type { GetOtpStatusRequest } from '@otp.com/sdk-node';
 
@@ -32,7 +32,7 @@ async function example() {
     // Configure HTTP bearer authorization: bearerAuth
     accessToken: "YOUR BEARER TOKEN",
   });
-  const api = new OtpApi(config);
+  const api = new OTPApi(config);
 
   const body = {
     // string
@@ -94,7 +94,7 @@ Resend a pending OTP, escalating the channel if configured.
 ```ts
 import {
   Configuration,
-  OtpApi,
+  OTPApi,
 } from '@otp.com/sdk-node';
 import type { ResendOtpRequest } from '@otp.com/sdk-node';
 
@@ -104,7 +104,7 @@ async function example() {
     // Configure HTTP bearer authorization: bearerAuth
     accessToken: "YOUR BEARER TOKEN",
   });
-  const api = new OtpApi(config);
+  const api = new OTPApi(config);
 
   const body = {
     // ResendRequest
@@ -171,7 +171,7 @@ Routing picks the channel from the app config. When it selects WhatsApp the code
 ```ts
 import {
   Configuration,
-  OtpApi,
+  OTPApi,
 } from '@otp.com/sdk-node';
 import type { SendOtpRequest } from '@otp.com/sdk-node';
 
@@ -181,7 +181,7 @@ async function example() {
     // Configure HTTP bearer authorization: bearerAuth
     accessToken: "YOUR BEARER TOKEN",
   });
-  const api = new OtpApi(config);
+  const api = new OTPApi(config);
 
   const body = {
     // SendRequest
@@ -247,7 +247,7 @@ Verify a code against a pending OTP.
 ```ts
 import {
   Configuration,
-  OtpApi,
+  OTPApi,
 } from '@otp.com/sdk-node';
 import type { VerifyOtpRequest } from '@otp.com/sdk-node';
 
@@ -257,7 +257,7 @@ async function example() {
     // Configure HTTP bearer authorization: bearerAuth
     accessToken: "YOUR BEARER TOKEN",
   });
-  const api = new OtpApi(config);
+  const api = new OTPApi(config);
 
   const body = {
     // VerifyRequest

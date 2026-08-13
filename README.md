@@ -29,8 +29,10 @@ import { Configuration, OTPApi } from '@otp.com/sdk-node'
 const otp = new OTPApi(new Configuration({ accessToken: process.env.OTP_API_KEY! }))
 
 // 1. Send. You pass the recipient; your account routing picks the channel.
+// clientIp = the END USER's IP from your request context (e.g. req.ip), not your server's:
+// requests without it share a much tighter rate limit.
 const sent = await otp.sendOtp({
-  sendRequest: { recipient: '+14155552671', locale: 'en' },
+  sendRequest: { recipient: '+14155552671', locale: 'en', clientIp: '81.2.69.142' },
 })
 
 sent.otpId            // keep this: you verify against it

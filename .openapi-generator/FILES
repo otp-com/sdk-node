@@ -3,7 +3,7 @@
 docs/Channel.md
 docs/ErrorBody.md
 docs/ErrorResponse.md
-docs/OtpApi.md
+docs/OTPApi.md
 docs/OtpResponse.md
 docs/OtpStatusResponse.md
 docs/ResendRequest.md
@@ -11,7 +11,7 @@ docs/SendRequest.md
 docs/Status.md
 docs/VerifyRequest.md
 docs/VerifyResponse.md
-src/apis/OtpApi.ts
+src/apis/OTPApi.ts
 src/apis/index.ts
 src/index.ts
 src/models/Channel.ts
