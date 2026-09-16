@@ -13,60 +13,52 @@
  */
 
 import { mapValues } from '../runtime';
-import type { ErrorBody } from './ErrorBody';
-import {
-    ErrorBodyFromJSON,
-    ErrorBodyFromJSONTyped,
-    ErrorBodyToJSON,
-    ErrorBodyToJSONTyped,
-} from './ErrorBody';
-
 /**
  * 
  * @export
- * @interface ErrorResponse
+ * @interface VerificationExchangeRequest
  */
-export interface ErrorResponse {
+export interface VerificationExchangeRequest {
     /**
-     * 
+     * The verification_token your app received from POST /client/otp/verify.
      */
-    error: ErrorBody;
+    verificationToken: string;
 }
 
 /**
- * Check if a given object implements the ErrorResponse interface.
+ * Check if a given object implements the VerificationExchangeRequest interface.
  */
-export function instanceOfErrorResponse(value: object): value is ErrorResponse {
-    if (!('error' in value) || value['error'] === undefined) return false;
+export function instanceOfVerificationExchangeRequest(value: object): value is VerificationExchangeRequest {
+    if ((!('verificationToken' in (value as Record<string, any>)) && !('verification_token' in (value as Record<string, any>))) || ((value as Record<string, any>)['verificationToken'] === undefined && (value as Record<string, any>)['verification_token'] === undefined)) return false;
     return true;
 }
 
-export function ErrorResponseFromJSON(json: any): ErrorResponse {
-    return ErrorResponseFromJSONTyped(json, false);
+export function VerificationExchangeRequestFromJSON(json: any): VerificationExchangeRequest {
+    return VerificationExchangeRequestFromJSONTyped(json, false);
 }
 
-export function ErrorResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): ErrorResponse {
+export function VerificationExchangeRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): VerificationExchangeRequest {
     if (json == null) {
         return json;
     }
     return {
         
-        'error': ErrorBodyFromJSON(json['error']),
+        'verificationToken': json['verification_token'],
     };
 }
 
-export function ErrorResponseToJSON(json: any): ErrorResponse {
-    return ErrorResponseToJSONTyped(json, false);
+export function VerificationExchangeRequestToJSON(json: any): VerificationExchangeRequest {
+    return VerificationExchangeRequestToJSONTyped(json, false);
 }
 
-export function ErrorResponseToJSONTyped(value?: ErrorResponse | null, ignoreDiscriminator: boolean = false): any {
+export function VerificationExchangeRequestToJSONTyped(value?: VerificationExchangeRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
-        'error': ErrorBodyToJSON(value['error']),
+        'verification_token': value['verificationToken'],
     };
 }
 

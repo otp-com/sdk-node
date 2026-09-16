@@ -17,19 +17,17 @@
  * 
  * @export
  */
-export const Status = {
-    Pending: 'pending',
-    Approved: 'approved',
-    Failed: 'failed',
-    Expired: 'expired'
+export const RecipientType = {
+    Phone: 'phone',
+    Email: 'email'
 } as const;
-export type Status = typeof Status[keyof typeof Status];
+export type RecipientType = typeof RecipientType[keyof typeof RecipientType];
 
 
-export function instanceOfStatus(value: any): boolean {
-    for (const key in Status) {
-        if (Object.prototype.hasOwnProperty.call(Status, key)) {
-            if (Status[key as keyof typeof Status] === value) {
+export function instanceOfRecipientType(value: any): boolean {
+    for (const key in RecipientType) {
+        if (Object.prototype.hasOwnProperty.call(RecipientType, key)) {
+            if (RecipientType[key as keyof typeof RecipientType] === value) {
                 return true;
             }
         }
@@ -37,19 +35,19 @@ export function instanceOfStatus(value: any): boolean {
     return false;
 }
 
-export function StatusFromJSON(json: any): Status {
-    return StatusFromJSONTyped(json, false);
+export function RecipientTypeFromJSON(json: any): RecipientType {
+    return RecipientTypeFromJSONTyped(json, false);
 }
 
-export function StatusFromJSONTyped(json: any, ignoreDiscriminator: boolean): Status {
-    return json as Status;
+export function RecipientTypeFromJSONTyped(json: any, ignoreDiscriminator: boolean): RecipientType {
+    return json as RecipientType;
 }
 
-export function StatusToJSON(value?: Status | null): any {
+export function RecipientTypeToJSON(value?: RecipientType | null): any {
     return value as any;
 }
 
-export function StatusToJSONTyped(value: any, ignoreDiscriminator: boolean): Status {
-    return value as Status;
+export function RecipientTypeToJSONTyped(value: any, ignoreDiscriminator: boolean): RecipientType {
+    return value as RecipientType;
 }
 
